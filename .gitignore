@@ -1,0 +1,10 @@
+backend/venv/
+backend/.env
+backend/resumeai.db
+backend/__pycache__/
+backend/app/__pycache__/
+backend/app/routers/__pycache__/
+backend/app/services/__pycache__/
+__pycache__/
+*.pyc
+.DS_Store

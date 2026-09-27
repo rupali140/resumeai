@@ -41,6 +41,44 @@ class ResumeOut(BaseModel):
         from_attributes = True
 
 
+class ResumeDetail(ResumeOut):
+    parsed_data: Optional[dict] = None
+
+
+class ResumeParsedUpdate(BaseModel):
+    parsed_data: dict
+
+
+# ---- Bullet optimizer ----
+class BulletOptimizeRequest(BaseModel):
+    bullet: str
+
+
+class BulletOptimizeResponse(BaseModel):
+    original: str
+    improved: str
+    explanation: str
+
+
+# ---- Analytics ----
+class ScorePoint(BaseModel):
+    date: datetime.datetime
+    ats_score: int
+    job_title: Optional[str] = None
+
+
+class SkillFrequency(BaseModel):
+    name: str
+    count: int
+
+
+class AnalyticsOut(BaseModel):
+    resumes_analyzed: int
+    average_score: Optional[float] = None
+    score_trend: List[ScorePoint]
+    most_common_missing_skills: List[SkillFrequency]
+
+
 # ---- Analysis ----
 class AnalyzeRequest(BaseModel):
     resume_id: int

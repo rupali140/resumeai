@@ -24,6 +24,7 @@ class Resume(Base):
     filename = Column(String, nullable=False)
     file_type = Column(String, nullable=False)
     raw_text = Column(Text, nullable=False)
+    parsed_data_json = Column(Text, nullable=True)  # structured fields extracted by AI, editable by user
     uploaded_at = Column(DateTime, default=datetime.datetime.utcnow)
 
     owner = relationship("User", back_populates="resumes")

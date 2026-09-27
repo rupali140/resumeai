@@ -102,3 +102,22 @@ def history(
         .all()
     )
     return rows
+
+
+@router.delete("/analysis/{analysis_id}", status_code=204)
+def delete_analysis(
+    analysis_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(security.get_current_user),
+):
+    row = (
+        db.query(models.Analysis)
+        .join(models.Resume)
+        .filter(models.Analysis.id == analysis_id, models.Resume.owner_id == current_user.id)
+        .first()
+    )
+    if not row:
+        raise HTTPException(status_code=404, detail="Analysis not found.")
+    db.delete(row)
+    db.commit()
+    return None

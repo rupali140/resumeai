@@ -127,3 +127,82 @@ def _validate_result(result: dict) -> None:
             status_code=502,
             detail=f"AI analysis response was missing fields: {', '.join(missing)}",
         )
+
+
+# ---------------------------------------------------------------------------
+# Structured resume field extraction (name, education, skills, experience...)
+# ---------------------------------------------------------------------------
+
+EXTRACT_SYSTEM_PROMPT = """You extract structured data from raw resume text.
+Respond with ONLY a single valid JSON object, no markdown fences, no commentary.
+Use this exact shape (use null or empty arrays for anything not present in the text):
+
+{
+  "name": <string or null>,
+  "email": <string or null>,
+  "phone": <string or null>,
+  "location": <string or null>,
+  "linkedin": <string or null>,
+  "github": <string or null>,
+  "portfolio": <string or null>,
+  "education": [{"degree": <string>, "institution": <string>, "year": <string or null>, "score": <string or null>}],
+  "skills": [<strings>],
+  "experience": [{"company": <string>, "role": <string>, "duration": <string or null>, "responsibilities": [<strings>]}],
+  "projects": [{"name": <string>, "technologies": [<strings>], "description": <string>}],
+  "certifications": [<strings>]
+}
+
+Only extract what is actually present in the text — do not invent information."""
+
+
+def extract_resume_fields(resume_text: str) -> dict:
+    client = get_client()
+    try:
+        response = client.messages.create(
+            model=settings.CLAUDE_MODEL,
+            max_tokens=1500,
+            system=EXTRACT_SYSTEM_PROMPT,
+            messages=[{"role": "user", "content": resume_text.strip()}],
+        )
+    except APIError as exc:
+        raise HTTPException(status_code=502, detail=f"AI extraction service error: {exc}")
+
+    raw_text = "".join(block.text for block in response.content if getattr(block, "type", "") == "text")
+    return _extract_json(raw_text)
+
+
+# ---------------------------------------------------------------------------
+# Bullet point optimizer
+# ---------------------------------------------------------------------------
+
+BULLET_SYSTEM_PROMPT = """You are an expert resume writer. Given one resume bullet point,
+rewrite it to be stronger: add measurable impact where plausible, use a strong action verb,
+and align it with language recruiters and ATS systems look for. Keep it truthful — do not
+invent specific numbers that weren't implied; instead phrase for impact without fabricating stats.
+
+Respond with ONLY a single valid JSON object, no markdown fences, no commentary:
+{
+  "original": <the original bullet, verbatim>,
+  "improved": <the rewritten bullet>,
+  "explanation": <one or two sentences on why the rewrite is stronger>
+}"""
+
+
+def optimize_bullet(bullet_text: str) -> dict:
+    client = get_client()
+    try:
+        response = client.messages.create(
+            model=settings.CLAUDE_MODEL,
+            max_tokens=500,
+            system=BULLET_SYSTEM_PROMPT,
+            messages=[{"role": "user", "content": bullet_text.strip()}],
+        )
+    except APIError as exc:
+        raise HTTPException(status_code=502, detail=f"AI optimization service error: {exc}")
+
+    raw_text = "".join(block.text for block in response.content if getattr(block, "type", "") == "text")
+    result = _extract_json(raw_text)
+    for key in ("original", "improved", "explanation"):
+        if key not in result:
+            raise HTTPException(status_code=502, detail="AI optimization response was incomplete.")
+    return result

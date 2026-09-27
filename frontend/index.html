@@ -185,6 +185,33 @@ footer{border-top:1px solid var(--border);padding:36px 0;color:var(--muted);font
 
 .fade-up{animation:fadeUp .6s ease both;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+
+/* ---------- light theme override ---------- */
+:root[data-theme="light"]{
+  --bg:#FBF6F1; --bg2:#F3E7DF; --surface:#FFFFFF; --surface2:#F6ECE4;
+  --border:rgba(43,10,20,0.10);
+  --text:#2B0A12; --muted:#8A6165;
+  --violet:#A85661; --cyan:#B08245; --gold:#A9793B;
+  --danger:#B23B4A; --good:#7C8A4E;
+}
+:root[data-theme="light"] body{background:radial-gradient(1200px 600px at 80% -10%,rgba(169,121,59,0.08),transparent),var(--bg);}
+:root[data-theme="light"] .topbar{background:rgba(251,246,241,0.85);}
+:root[data-theme="light"] .bottom-nav{background:rgba(255,255,255,0.9);}
+
+/* ---------- skeleton loaders ---------- */
+.skeleton{background:linear-gradient(90deg,var(--surface2) 25%,var(--border) 50%,var(--surface2) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:8px;}
+@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+.skel-line{height:14px;margin-bottom:10px;width:100%;}
+.skel-line.short{width:40%;}
+
+/* ---------- 404 ---------- */
+.error-404{text-align:center;padding:80px 20px;}
+.error-404 .code{font-size:80px;font-weight:800;color:var(--gold);line-height:1;margin-bottom:10px;}
+
+/* ---------- editable field ---------- */
+.field-input{width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:inherit;font-size:13px;}
+.field-group{margin-bottom:12px;}
+.field-group label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;}
 </style>
 </head>
 <body>
@@ -267,6 +294,72 @@ footer{border-top:1px solid var(--border);padding:36px 0;color:var(--muted);font
   <div class="container"><footer><div>© 2026 ResumeAI</div><div>Privacy · Terms · Contact</div></footer></div>
 </div>
 
+<!-- ================= AUTH ================= -->
+<div id="authScreen" style="display:none;min-height:100vh;align-items:center;justify-content:center;padding:40px 20px;">
+  <div style="width:100%;max-width:420px;">
+    <div class="brand" style="justify-content:center;margin-bottom:28px;"><div class="brand-mark">R</div>ResumeAI</div>
+    <div class="panel">
+      <div style="display:flex;gap:8px;margin-bottom:22px;background:var(--surface2);border-radius:12px;padding:4px;">
+        <button class="btn" id="tabLoginBtn" onclick="switchAuthTab('login')" style="flex:1;background:var(--gold);color:#26060C;">Log in</button>
+        <button class="btn btn-ghost" id="tabRegisterBtn" onclick="switchAuthTab('register')" style="flex:1;border:none;">Register</button>
+      </div>
+
+      <!-- Login form -->
+      <form id="loginForm" onsubmit="return submitLogin(event)">
+        <div style="margin-bottom:14px;">
+          <label class="mock-label" style="display:block;margin-bottom:6px;">Email</label>
+          <input type="email" id="loginEmail" required placeholder="you@example.com"
+                 style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:inherit;font-size:14px;">
+        </div>
+        <div style="margin-bottom:10px;">
+          <label class="mock-label" style="display:block;margin-bottom:6px;">Password</label>
+          <div style="position:relative;">
+            <input type="password" id="loginPassword" required minlength="8" placeholder="••••••••"
+                   style="width:100%;padding:12px 44px 12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:inherit;font-size:14px;">
+            <button type="button" class="icon-btn" onclick="togglePw('loginPassword',this)" style="position:absolute;right:2px;top:2px;">👁</button>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;font-size:13px;color:var(--muted);">
+          <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" id="rememberMe" checked> Remember me</label>
+          <a href="#" onclick="showToast('Password reset isn\'t set up in this build yet.');return false;" style="color:var(--gold);">Forgot password?</a>
+        </div>
+        <p id="loginError" style="color:var(--danger);font-size:13px;margin:0 0 12px;display:none;"></p>
+        <button class="btn btn-primary btn-lg" type="submit" id="loginSubmitBtn" style="width:100%;">Log in</button>
+      </form>
+
+      <!-- Register form -->
+      <form id="registerForm" onsubmit="return submitRegister(event)" style="display:none;">
+        <div style="margin-bottom:14px;">
+          <label class="mock-label" style="display:block;margin-bottom:6px;">Name</label>
+          <input type="text" id="registerName" required placeholder="Your name"
+                 style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:inherit;font-size:14px;">
+        </div>
+        <div style="margin-bottom:14px;">
+          <label class="mock-label" style="display:block;margin-bottom:6px;">Email</label>
+          <input type="email" id="registerEmail" required placeholder="you@example.com"
+                 style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:inherit;font-size:14px;">
+        </div>
+        <div style="margin-bottom:14px;">
+          <label class="mock-label" style="display:block;margin-bottom:6px;">Password</label>
+          <div style="position:relative;">
+            <input type="password" id="registerPassword" required minlength="8" placeholder="Minimum 8 characters"
+                   style="width:100%;padding:12px 44px 12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:inherit;font-size:14px;">
+            <button type="button" class="icon-btn" onclick="togglePw('registerPassword',this)" style="position:absolute;right:2px;top:2px;">👁</button>
+          </div>
+        </div>
+        <div style="margin-bottom:16px;">
+          <label class="mock-label" style="display:block;margin-bottom:6px;">Confirm password</label>
+          <input type="password" id="registerConfirm" required minlength="8" placeholder="Repeat password"
+                 style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:inherit;font-size:14px;">
+        </div>
+        <p id="registerError" style="color:var(--danger);font-size:13px;margin:0 0 12px;display:none;"></p>
+        <button class="btn btn-primary btn-lg" type="submit" id="registerSubmitBtn" style="width:100%;">Create account</button>
+      </form>
+    </div>
+    <p style="text-align:center;margin-top:18px;"><a href="#" onclick="closeAuth();return false;" style="color:var(--muted);font-size:13px;">← Back to site</a></p>
+  </div>
+</div>
+
 <!-- ================= APP SHELL ================= -->
 <div class="app-shell" id="appShell">
   <div class="sidebar">
@@ -275,6 +368,11 @@ footer{border-top:1px solid var(--border);padding:36px 0;color:var(--muted);font
     <div class="side-link" data-page="upload" onclick="showPage('upload')">⬆ Analyze Resume</div>
     <div class="side-link" data-page="ats" onclick="showPage('ats')">◎ ATS Score</div>
     <div class="side-link" data-page="skills" onclick="showPage('skills')">⬡ Skills Gap</div>
+    <div class="side-link" data-page="bullet" onclick="showPage('bullet')">✎ Bullet Optimizer</div>
+    <div class="side-link" data-page="analytics" onclick="showPage('analytics')">📈 Analytics</div>
+    <div class="side-link" data-page="history" onclick="showPage('history')">🕒 History</div>
+    <div class="side-link" data-page="compare" onclick="showPage('compare')">⇄ Compare</div>
+    <div class="side-link" data-page="profile" onclick="showPage('profile')">⚙ Profile</div>
     <div class="side-link" onclick="backToLanding()" style="margin-top:20px;">← Exit to site</div>
   </div>
 
@@ -330,6 +428,14 @@ footer{border-top:1px solid var(--border);padding:36px 0;color:var(--muted);font
           </div>
         </div>
       </div>
+      <div class="panel" id="parsedPanel" style="display:none;">
+        <h2>Extracted information</h2>
+        <p class="sub">Review what the AI pulled from your resume and correct anything that's wrong</p>
+        <div id="parsedFields"></div>
+        <div id="parsedReadonly" style="margin-top:6px;"></div>
+        <button class="btn btn-ghost" style="margin-top:14px;" onclick="saveParsedFields()">Save corrections</button>
+        <span id="parsedSaveMsg" class="sub" style="margin-left:10px;display:none;color:var(--good);">Saved ✓</span>
+      </div>
       <div class="panel" id="jdPanel" style="display:none;">
         <h2>Job description</h2>
         <p class="sub">Paste the role you're targeting — the AI compares your resume against this exact text</p>
@@ -342,8 +448,47 @@ footer{border-top:1px solid var(--border);padding:36px 0;color:var(--muted);font
       </div>
     </section>
 
-    <!-- ATS Score -->
-    <section id="page-ats" style="display:none;">
+    <!-- Bullet Optimizer -->
+    <section id="page-bullet" style="display:none;">
+      <div class="page-head"><div><h1>Bullet Point Optimizer</h1><p>Paste one resume bullet and get an AI-strengthened rewrite.</p></div></div>
+      <div class="panel">
+        <label class="mock-label" style="display:block;margin-bottom:8px;">Your bullet point</label>
+        <textarea id="bulletInput" rows="3" placeholder="e.g. Worked on a website using React."
+                  style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:inherit;font-size:14px;resize:vertical;"></textarea>
+        <button class="btn btn-primary" style="margin-top:14px;" id="bulletBtn" onclick="runBulletOptimize()">Optimize</button>
+        <p class="sub" id="bulletError" style="color:var(--danger);margin-top:10px;display:none;"></p>
+      </div>
+      <div id="bulletResult"></div>
+    </section>
+
+    <!-- Analytics -->
+    <section id="page-analytics" style="display:none;">
+      <div class="page-head"><div><h1>Analytics</h1><p>Your progress across every analysis you've run.</p></div></div>
+      <div class="cards-row" style="grid-template-columns:repeat(2,1fr);">
+        <div class="stat-card"><div class="mock-label">Resumes Analyzed</div><div class="mock-value violet" id="anResumes">—</div></div>
+        <div class="stat-card"><div class="mock-label">Average ATS Score</div><div class="mock-value gold" id="anAverage">—</div></div>
+      </div>
+      <div class="panel">
+        <h2>Score over time</h2>
+        <p class="sub">Each point is one analysis, in order</p>
+        <div id="scoreChart"><p class="sub">Loading…</p></div>
+      </div>
+      <div class="panel">
+        <h2>Most common missing skills</h2>
+        <p class="sub">Skills that show up as gaps most often across your analyses</p>
+        <div id="missingSkillsChart"></div>
+      </div>
+    </section>
+
+    <!-- 404 -->
+    <section id="page-404" style="display:none;">
+      <div class="error-404">
+        <div class="code">404</div>
+        <h2>Page not found</h2>
+        <p class="sub" style="margin-bottom:20px;">That page doesn't exist. Let's get you back on track.</p>
+        <button class="btn btn-primary" onclick="showPage('dashboard')">Go to Dashboard</button>
+      </div>
+    </section>    <section id="page-ats" style="display:none;">
       <div class="page-head"><div><h1>ATS Score</h1><p id="atsSubtitle">How your resume performs against automated screening.</p></div></div>
       <div id="atsEmpty" class="panel"><p class="sub">No analysis yet. <a href="#" onclick="showPage('upload');return false;" style="color:var(--gold);">Upload a resume and job description</a> to generate your ATS score.</p></div>
       <div id="atsContent" style="display:none;">
@@ -394,14 +539,70 @@ footer{border-top:1px solid var(--border);padding:36px 0;color:var(--muted);font
         </div>
       </div>
     </section>
+
+    <!-- History -->
+    <section id="page-history" style="display:none;">
+      <div class="page-head"><div><h1>Resume History</h1><p>Every analysis you've run, searchable and comparable.</p></div></div>
+      <div class="panel">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;">
+          <input id="historySearch" type="text" placeholder="Search by job title…" oninput="renderHistoryTable()"
+                 style="flex:1;min-width:180px;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:inherit;font-size:14px;">
+          <select id="historySort" onchange="renderHistoryTable()" style="padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:inherit;font-size:14px;">
+            <option value="date_desc">Newest first</option>
+            <option value="date_asc">Oldest first</option>
+            <option value="score_desc">Highest score</option>
+            <option value="score_asc">Lowest score</option>
+          </select>
+        </div>
+        <div id="historyTable"><p class="sub">Loading…</p></div>
+      </div>
+    </section>
+
+    <!-- Compare -->
+    <section id="page-compare" style="display:none;">
+      <div class="page-head"><div><h1>Resume Comparison</h1><p>Pick two analyses to compare side by side.</p></div></div>
+      <div class="panel">
+        <div class="two-col">
+          <div>
+            <p class="sub" style="margin-bottom:8px;">Analysis A</p>
+            <select id="compareA" onchange="renderComparison()" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:inherit;font-size:14px;"></select>
+          </div>
+          <div>
+            <p class="sub" style="margin-bottom:8px;">Analysis B</p>
+            <select id="compareB" onchange="renderComparison()" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:inherit;font-size:14px;"></select>
+          </div>
+        </div>
+      </div>
+      <div id="compareResult"></div>
+    </section>
+
+    <!-- Profile -->
+    <section id="page-profile" style="display:none;">
+      <div class="page-head"><div><h1>Profile</h1><p>Your account details.</p></div></div>
+      <div class="panel" style="max-width:480px;">
+        <div class="progress-row"><div class="progress-label">Name</div><div style="flex:1;font-size:14px;" id="profileName">—</div></div>
+        <div class="progress-row"><div class="progress-label">Email</div><div style="flex:1;font-size:14px;" id="profileEmail">—</div></div>
+        <button class="btn btn-ghost" style="width:100%;margin-top:12px;" onclick="logout()">Log out</button>
+      </div>
+      <div class="panel" style="max-width:480px;">
+        <h2>Theme</h2>
+        <p class="sub">Choose how ResumeAI looks on this device</p>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-ghost" id="themeDarkBtn" style="flex:1;" onclick="setTheme('dark')">Dark</button>
+          <button class="btn btn-ghost" id="themeLightBtn" style="flex:1;" onclick="setTheme('light')">Light</button>
+          <button class="btn btn-ghost" id="themeSystemBtn" style="flex:1;" onclick="setTheme('system')">System</button>
+        </div>
+      </div>
+    </section>
   </div>
 </div>
 
 <div class="bottom-nav" id="bottomNav">
   <button data-page="dashboard" onclick="showPage('dashboard')">🏠<span>Home</span></button>
   <button data-page="upload" onclick="showPage('upload')">⬆<span>Upload</span></button>
-  <button data-page="ats" onclick="showPage('ats')">◎<span>ATS</span></button>
-  <button data-page="skills" onclick="showPage('skills')">⬡<span>Skills</span></button>
+  <button data-page="history" onclick="showPage('history')">🕒<span>History</span></button>
+  <button data-page="compare" onclick="showPage('compare')">⇄<span>Compare</span></button>
+  <button data-page="profile" onclick="showPage('profile')">⚙<span>Profile</span></button>
 </div>
 
 <div class="toast" id="toast"><span class="dot"></span><span id="toastMsg">Saved</span></div>
@@ -434,6 +635,7 @@ function esc(str){
 /* ============ Auth (JWT stored locally) ============ */
 function getToken(){ try { return localStorage.getItem('resumeai_token'); } catch(e){ return null; } }
 function setToken(t){ try { localStorage.setItem('resumeai_token', t); } catch(e){} }
+function clearToken(){ try { localStorage.removeItem('resumeai_token'); localStorage.removeItem('resumeai_name'); } catch(e){} }
 function getUserName(){ try { return localStorage.getItem('resumeai_name') || 'there'; } catch(e){ return 'there'; } }
 function setUserName(n){ try { localStorage.setItem('resumeai_name', n); } catch(e){} }
 
@@ -455,34 +657,100 @@ async function api(path, options={}){
   return data;
 }
 
-// Ensures the visitor has a valid session before using the app.
-// Auto-registers a lightweight account on first visit; logs in on return.
-async function ensureSession(){
-  if(getToken()) return true;
-  const email = prompt('Enter your email to save your analyses:');
-  if(!email) return false;
-  const password = prompt('Choose a password (min 8 characters):') || '';
-  if(password.length < 8){ showToast('Password must be at least 8 characters'); return false; }
+let pendingDestination = 'dashboard';
+
+function showAuth(destination){
+  pendingDestination = destination || 'dashboard';
+  document.getElementById('landing').style.display='none';
+  document.getElementById('appShell').classList.remove('active');
+  document.getElementById('bottomNav').classList.remove('active-shell');
+  document.getElementById('authScreen').style.display='flex';
+  window.scrollTo(0,0);
+}
+function closeAuth(){
+  document.getElementById('authScreen').style.display='none';
+  document.getElementById('landing').style.display='block';
+}
+function switchAuthTab(tab){
+  const isLogin = tab==='login';
+  document.getElementById('loginForm').style.display = isLogin ? 'block' : 'none';
+  document.getElementById('registerForm').style.display = isLogin ? 'none' : 'block';
+  document.getElementById('tabLoginBtn').className = isLogin ? 'btn' : 'btn btn-ghost';
+  document.getElementById('tabLoginBtn').style.cssText = isLogin ? 'flex:1;background:var(--gold);color:#26060C;' : 'flex:1;border:none;';
+  document.getElementById('tabRegisterBtn').className = isLogin ? 'btn btn-ghost' : 'btn';
+  document.getElementById('tabRegisterBtn').style.cssText = isLogin ? 'flex:1;border:none;' : 'flex:1;background:var(--gold);color:#26060C;';
+}
+function togglePw(id, btn){
+  const input = document.getElementById(id);
+  input.type = input.type==='password' ? 'text' : 'password';
+  btn.textContent = input.type==='password' ? '👁' : '🙈';
+}
+
+async function submitLogin(event){
+  event.preventDefault();
+  const errEl = document.getElementById('loginError');
+  errEl.style.display='none';
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const btn = document.getElementById('loginSubmitBtn');
+  btn.textContent = 'Logging in…'; btn.disabled = true;
   try {
-    let data;
-    try {
-      data = await api('/api/auth/login', { method:'POST', json:{ email, password } });
-    } catch(e){
-      data = await api('/api/auth/register', { method:'POST', json:{ email, password, name: email.split('@')[0] } });
-    }
+    const data = await api('/api/auth/login', { method:'POST', json:{ email, password } });
     setToken(data.access_token);
     setUserName(data.user.name || data.user.email.split('@')[0]);
-    return true;
+    enterApp(pendingDestination);
   } catch(e){
-    showToast(e.message);
-    return false;
+    errEl.textContent = e.message;
+    errEl.style.display='block';
+  } finally {
+    btn.textContent = 'Log in'; btn.disabled = false;
   }
+  return false;
+}
+
+async function submitRegister(event){
+  event.preventDefault();
+  const errEl = document.getElementById('registerError');
+  errEl.style.display='none';
+  const name = document.getElementById('registerName').value.trim();
+  const email = document.getElementById('registerEmail').value.trim();
+  const password = document.getElementById('registerPassword').value;
+  const confirm = document.getElementById('registerConfirm').value;
+  if(password !== confirm){ errEl.textContent='Passwords do not match.'; errEl.style.display='block'; return false; }
+  if(password.length < 8){ errEl.textContent='Password must be at least 8 characters.'; errEl.style.display='block'; return false; }
+
+  const btn = document.getElementById('registerSubmitBtn');
+  btn.textContent = 'Creating account…'; btn.disabled = true;
+  try {
+    const data = await api('/api/auth/register', { method:'POST', json:{ email, password, name } });
+    setToken(data.access_token);
+    setUserName(data.user.name || data.user.email.split('@')[0]);
+    enterApp(pendingDestination);
+  } catch(e){
+    errEl.textContent = e.message;
+    errEl.style.display='block';
+  } finally {
+    btn.textContent = 'Create account'; btn.disabled = false;
+  }
+  return false;
+}
+
+function logout(){
+  clearToken();
+  document.getElementById('appShell').classList.remove('active');
+  document.getElementById('bottomNav').classList.remove('active-shell');
+  document.getElementById('landing').style.display='block';
+  window.scrollTo(0,0);
+  showToast('Logged out');
 }
 
 /* ============ Navigation ============ */
-async function openApp(page){
-  const ok = await ensureSession();
-  if(!ok) return;
+function openApp(page){
+  if(getToken()){ enterApp(page); }
+  else { showAuth(page); }
+}
+function enterApp(page){
+  document.getElementById('authScreen').style.display='none';
   document.getElementById('landing').style.display='none';
   document.getElementById('appShell').classList.add('active');
   document.getElementById('bottomNav').classList.add('active-shell');
@@ -497,13 +765,186 @@ function backToLanding(){
   document.getElementById('landing').style.display='block';
   window.scrollTo(0,0);
 }
+const VALID_PAGES = ['dashboard','upload','ats','skills','history','compare','profile','bullet','analytics'];
+
 function showPage(page){
-  ['dashboard','upload','ats','skills'].forEach(p=>{
+  if(!VALID_PAGES.includes(page)){
+    document.querySelectorAll('#appShell section[id^="page-"]').forEach(el=>el.style.display='none');
+    document.getElementById('page-404').style.display='block';
+    window.scrollTo(0,0);
+    return;
+  }
+  document.getElementById('page-404').style.display='none';
+  VALID_PAGES.forEach(p=>{
     document.getElementById('page-'+p).style.display=(p===page)?'block':'none';
   });
   document.querySelectorAll('.side-link[data-page]').forEach(el=>el.classList.toggle('active',el.dataset.page===page));
   document.querySelectorAll('#bottomNav button').forEach(el=>el.classList.toggle('active',el.dataset.page===page));
   window.scrollTo(0,0);
+  try { history.replaceState(null,'', '#'+page); } catch(e){}
+  if(page==='history') loadHistoryData();
+  if(page==='compare') loadHistoryData();
+  if(page==='profile') loadProfile();
+  if(page==='analytics') loadAnalytics();
+}
+
+/* ============ Theme ============ */
+function applyTheme(){
+  let pref;
+  try { pref = localStorage.getItem('resumeai_theme') || 'dark'; } catch(e){ pref = 'dark'; }
+  let effective = pref;
+  if(pref === 'system'){
+    effective = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+  }
+  document.documentElement.setAttribute('data-theme', effective === 'light' ? 'light' : 'dark');
+  ['themeDarkBtn','themeLightBtn','themeSystemBtn'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.style.cssText = 'flex:1;border:1px solid var(--border);';
+  });
+  const activeId = pref==='light' ? 'themeLightBtn' : pref==='system' ? 'themeSystemBtn' : 'themeDarkBtn';
+  const activeEl = document.getElementById(activeId);
+  if(activeEl) activeEl.style.cssText = 'flex:1;background:var(--gold);color:#26060C;border:none;';
+}
+function setTheme(mode){
+  try { localStorage.setItem('resumeai_theme', mode); } catch(e){}
+  applyTheme();
+}
+applyTheme();
+
+/* ============ Bullet Optimizer ============ */
+async function runBulletOptimize(){
+  const bullet = document.getElementById('bulletInput').value.trim();
+  const errEl = document.getElementById('bulletError');
+  errEl.style.display='none';
+  if(!bullet){ showToast('Paste a bullet point first'); return; }
+
+  const btn = document.getElementById('bulletBtn');
+  btn.textContent = 'Optimizing…'; btn.disabled = true;
+  document.getElementById('bulletResult').innerHTML = `
+    <div class="panel"><div class="skeleton skel-line"></div><div class="skeleton skel-line short"></div></div>`;
+
+  try {
+    const result = await api('/api/optimize/bullet', { method:'POST', json:{ bullet } });
+    document.getElementById('bulletResult').innerHTML = `
+      <div class="panel">
+        <p class="sub" style="margin-bottom:6px;">Before</p>
+        <p style="margin:0 0 18px;font-size:14px;color:var(--muted);">${esc(result.original)}</p>
+        <p class="sub" style="margin-bottom:6px;">After</p>
+        <p style="margin:0 0 18px;font-size:15px;font-weight:600;">${esc(result.improved)}</p>
+        <div class="suggestion"><span class="tag">Why this is stronger</span><p>${esc(result.explanation)}</p></div>
+      </div>`;
+  } catch(e){
+    document.getElementById('bulletResult').innerHTML = '';
+    errEl.textContent = e.message;
+    errEl.style.display = 'block';
+  } finally {
+    btn.textContent = 'Optimize'; btn.disabled = false;
+  }
+}
+
+/* ============ Analytics ============ */
+async function loadAnalytics(){
+  document.getElementById('scoreChart').innerHTML = '<div class="skeleton" style="height:160px;"></div>';
+  document.getElementById('missingSkillsChart').innerHTML = '<div class="skeleton skel-line"></div><div class="skeleton skel-line"></div>';
+  try {
+    const data = await api('/api/analytics');
+    document.getElementById('anResumes').textContent = data.resumes_analyzed;
+    document.getElementById('anAverage').textContent = data.average_score != null ? data.average_score : '—';
+    renderScoreChart(data.score_trend);
+    renderMissingSkillsChart(data.most_common_missing_skills);
+  } catch(e){
+    document.getElementById('scoreChart').innerHTML = `<p class="sub" style="color:var(--danger);">${esc(e.message)}</p>`;
+  }
+}
+function renderScoreChart(points){
+  const el = document.getElementById('scoreChart');
+  if(!points || points.length === 0){
+    el.innerHTML = '<p class="sub">No analyses yet — run one to start tracking your progress.</p>';
+    return;
+  }
+  const w = 600, h = 180, pad = 24;
+  const xs = points.map((_,i)=> pad + (i*(w-2*pad)/Math.max(points.length-1,1)));
+  const ys = points.map(p=> h-pad - (p.ats_score/100)*(h-2*pad));
+  const pathD = xs.map((x,i)=> (i===0?'M':'L')+x+','+ys[i]).join(' ');
+  const dots = xs.map((x,i)=>`<circle cx="${x}" cy="${ys[i]}" r="4" fill="#D4AF6A"/>`).join('');
+  el.innerHTML = `
+    <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;overflow:visible;">
+      <line x1="${pad}" y1="${h-pad}" x2="${w-pad}" y2="${h-pad}" stroke="var(--border)" stroke-width="1"/>
+      <path d="${pathD}" fill="none" stroke="#D4AF6A" stroke-width="2.5"/>
+      ${dots}
+    </svg>
+    <p class="sub" style="margin-top:8px;">${points.length} analysis${points.length===1?'':'es'} · latest score ${points[points.length-1].ats_score}</p>`;
+}
+function renderMissingSkillsChart(skills){
+  const el = document.getElementById('missingSkillsChart');
+  if(!skills || skills.length === 0){
+    el.innerHTML = '<p class="sub">No recurring gaps yet.</p>';
+    return;
+  }
+  const max = Math.max(...skills.map(s=>s.count));
+  el.innerHTML = skills.map(s => `
+    <div style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;"><span>${esc(s.name)}</span><span class="sub">${s.count}×</span></div>
+      <div class="progress-track"><div class="progress-fill" style="width:${(s.count/max*100)}%;background:var(--gold);"></div></div>
+    </div>`).join('');
+}
+
+/* ============ Parsed resume fields ============ */
+let currentParsedData = null;
+function renderParsedFields(data){
+  currentParsedData = data || {};
+  const panel = document.getElementById('parsedPanel');
+  if(!data){ panel.style.display='none'; return; }
+  panel.style.display='block';
+
+  const scalarFields = [
+    ['name','Name'], ['email','Email'], ['phone','Phone'], ['location','Location'],
+    ['linkedin','LinkedIn'], ['github','GitHub'], ['portfolio','Portfolio']
+  ];
+  document.getElementById('parsedFields').innerHTML = `
+    <div class="cards-row" style="grid-template-columns:repeat(2,1fr);margin-bottom:0;">
+      ${scalarFields.map(([key,label])=>`
+        <div class="field-group">
+          <label>${label}</label>
+          <input class="field-input" id="pf-${key}" value="${esc(data[key]||'')}">
+        </div>`).join('')}
+    </div>
+    <div class="field-group">
+      <label>Skills (comma-separated)</label>
+      <input class="field-input" id="pf-skills" value="${esc((data.skills||[]).join(', '))}">
+    </div>`;
+
+  const readonlyParts = [];
+  if(data.education && data.education.length){
+    readonlyParts.push(`<p class="sub" style="margin:14px 0 6px;">Education</p>` + data.education.map(e=>
+      `<div class="skill-row"><div class="name">${esc(e.degree||'')}</div><div class="cat">${esc(e.institution||'')} ${e.year?'· '+esc(e.year):''}</div></div>`).join(''));
+  }
+  if(data.experience && data.experience.length){
+    readonlyParts.push(`<p class="sub" style="margin:14px 0 6px;">Experience</p>` + data.experience.map(e=>
+      `<div class="skill-row"><div class="name">${esc(e.role||'')} — ${esc(e.company||'')}</div><div class="cat">${esc(e.duration||'')}</div></div>`).join(''));
+  }
+  if(data.projects && data.projects.length){
+    readonlyParts.push(`<p class="sub" style="margin:14px 0 6px;">Projects</p>` + data.projects.map(p=>
+      `<div class="skill-row"><div class="name">${esc(p.name||'')}</div><div class="cat">${esc((p.technologies||[]).join(', '))}</div></div>`).join(''));
+  }
+  document.getElementById('parsedReadonly').innerHTML = readonlyParts.join('');
+}
+async function saveParsedFields(){
+  if(!uploadedResumeId || !currentParsedData) return;
+  const updated = { ...currentParsedData };
+  ['name','email','phone','location','linkedin','github','portfolio'].forEach(key=>{
+    updated[key] = document.getElementById('pf-'+key).value.trim() || null;
+  });
+  updated.skills = document.getElementById('pf-skills').value.split(',').map(s=>s.trim()).filter(Boolean);
+
+  try {
+    await api(`/api/resumes/${uploadedResumeId}/parsed`, { method:'PUT', json:{ parsed_data: updated } });
+    currentParsedData = updated;
+    const msg = document.getElementById('parsedSaveMsg');
+    msg.style.display='inline';
+    setTimeout(()=> msg.style.display='none', 2000);
+  } catch(e){ showToast(e.message); }
 }
 
 /* ============ Dashboard ============ */
@@ -526,6 +967,136 @@ async function loadDashboard(){
   } catch(e){ /* not fatal on dashboard load */ }
 }
 
+/* ============ Profile ============ */
+async function loadProfile(){
+  try {
+    const user = await api('/api/auth/me');
+    document.getElementById('profileName').textContent = user.name || '—';
+    document.getElementById('profileEmail').textContent = user.email;
+  } catch(e){ showToast(e.message); }
+}
+
+/* ============ History ============ */
+let historyCache = [];
+async function loadHistoryData(){
+  try {
+    historyCache = await api('/api/history');
+  } catch(e){
+    historyCache = [];
+    showToast(e.message);
+  }
+  renderHistoryTable();
+  populateCompareSelects();
+}
+function renderHistoryTable(){
+  const container = document.getElementById('historyTable');
+  if(!container) return;
+  const search = (document.getElementById('historySearch').value || '').toLowerCase();
+  const sort = document.getElementById('historySort').value;
+
+  let rows = historyCache.filter(h => (h.job_title || 'untitled role').toLowerCase().includes(search));
+  rows.sort((a,b)=>{
+    if(sort==='date_desc') return new Date(b.created_at)-new Date(a.created_at);
+    if(sort==='date_asc') return new Date(a.created_at)-new Date(b.created_at);
+    if(sort==='score_desc') return b.ats_score-a.ats_score;
+    if(sort==='score_asc') return a.ats_score-b.ats_score;
+  });
+
+  if(rows.length===0){
+    container.innerHTML = '<p class="sub">No analyses match your search.</p>';
+    return;
+  }
+  container.innerHTML = rows.map(h => `
+    <div class="skill-row">
+      <div>
+        <div class="name">${esc(h.job_title || 'Untitled role')}</div>
+        <div class="cat">${new Date(h.created_at).toLocaleDateString()} · ATS ${h.ats_score}</div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <button class="btn btn-ghost" style="padding:8px 12px;font-size:13px;" onclick="viewAnalysis(${h.id})">View</button>
+        <button class="btn btn-ghost" style="padding:8px 12px;font-size:13px;" onclick="reanalyze(${h.id})">Analyze again</button>
+        <button class="icon-btn" onclick="deleteAnalysis(${h.id})" aria-label="Delete">✕</button>
+      </div>
+    </div>`).join('');
+}
+async function viewAnalysis(id){
+  try {
+    const result = await api('/api/analysis/'+id);
+    lastAnalysis = result;
+    renderAts(result);
+    renderSkills(result);
+    showPage('ats');
+  } catch(e){ showToast(e.message); }
+}
+async function reanalyze(id){
+  try {
+    const original = await api('/api/analysis/'+id);
+    showToast('Re-running analysis…');
+    const result = await api('/api/analyze', { method:'POST', json:{ resume_id: original.resume_id, job_title: original.job_title, job_description: original.job_description } });
+    lastAnalysis = result;
+    renderAts(result);
+    renderSkills(result);
+    showToast('Analysis complete — ATS score ready');
+    showPage('ats');
+    loadDashboard();
+  } catch(e){ showToast(e.message); }
+}
+async function deleteAnalysis(id){
+  if(!confirm('Delete this analysis? This cannot be undone.')) return;
+  try {
+    await api('/api/analysis/'+id, { method:'DELETE' });
+    showToast('Analysis deleted');
+    loadHistoryData();
+    loadDashboard();
+  } catch(e){ showToast(e.message); }
+}
+
+/* ============ Compare ============ */
+function populateCompareSelects(){
+  const opts = '<option value="">Select an analysis…</option>' + historyCache.map(h =>
+    `<option value="${h.id}">${esc(h.job_title || 'Untitled role')} — ${new Date(h.created_at).toLocaleDateString()} (${h.ats_score})</option>`
+  ).join('');
+  document.getElementById('compareA').innerHTML = opts;
+  document.getElementById('compareB').innerHTML = opts;
+}
+async function renderComparison(){
+  const idA = document.getElementById('compareA').value;
+  const idB = document.getElementById('compareB').value;
+  const resultEl = document.getElementById('compareResult');
+  if(!idA || !idB){ resultEl.innerHTML=''; return; }
+  if(idA === idB){ resultEl.innerHTML = '<div class="panel"><p class="sub">Choose two different analyses to compare.</p></div>'; return; }
+
+  resultEl.innerHTML = '<div class="panel"><p class="sub">Loading comparison…</p></div>';
+  try {
+    const [a, b] = await Promise.all([api('/api/analysis/'+idA), api('/api/analysis/'+idB)]);
+    const rows = [
+      ['Overall ATS Score', a.ats_score, b.ats_score],
+      ['Keyword Match', a.keyword_match, b.keyword_match],
+      ['Skills Match', a.skills_match, b.skills_match],
+      ['Experience Relevance', a.experience_relevance, b.experience_relevance],
+      ['Education Match', a.education_match, b.education_match],
+      ['Formatting', a.formatting_score, b.formatting_score],
+      ['Skills matched', a.matched_skills.length, b.matched_skills.length],
+      ['Skills missing', a.missing_skills.length, b.missing_skills.length],
+    ];
+    resultEl.innerHTML = `
+      <div class="panel">
+        <h2>${esc(a.job_title || 'Analysis A')} vs ${esc(b.job_title || 'Analysis B')}</h2>
+        <p class="sub">Side-by-side comparison</p>
+        ${rows.map(([label,av,bv])=>`
+          <div class="progress-row">
+            <div class="progress-label">${esc(label)}</div>
+            <div style="flex:1;text-align:right;font-weight:700;color:${av>=bv?'var(--good)':'var(--text)'}">${av}</div>
+            <div style="width:24px;text-align:center;color:var(--muted);">vs</div>
+            <div style="flex:1;font-weight:700;color:${bv>=av?'var(--good)':'var(--text)'}">${bv}</div>
+          </div>
+        `).join('')}
+      </div>`;
+  } catch(e){
+    resultEl.innerHTML = `<div class="panel"><p class="sub" style="color:var(--danger);">${esc(e.message)}</p></div>`;
+  }
+}
+
 /* ============ Upload ============ */
 let uploadedResumeId = null;
 
@@ -540,8 +1111,7 @@ function handleFileSelect(e){
   if(e.target.files.length) uploadFile(e.target.files[0]);
 }
 async function uploadFile(file){
-  const ok = await ensureSession();
-  if(!ok) return;
+  if(!getToken()){ showAuth('upload'); return; }
 
   const ext = file.name.split('.').pop().toLowerCase();
   if(!['pdf','docx'].includes(ext)){ showToast('Only PDF and DOCX files are supported'); return; }
@@ -570,6 +1140,7 @@ async function uploadFile(file){
 
     uploadedResumeId = data.id;
     document.getElementById('fileStatus').textContent = 'Uploaded — text extracted successfully';
+    renderParsedFields(data.parsed_data);
     document.getElementById('jdPanel').style.display='block';
     showToast('Resume uploaded successfully');
   } catch(e){
@@ -579,7 +1150,9 @@ async function uploadFile(file){
 }
 function resetUpload(){
   uploadedResumeId = null;
+  currentParsedData = null;
   document.getElementById('fileRow').style.display='none';
+  document.getElementById('parsedPanel').style.display='none';
   document.getElementById('jdPanel').style.display='none';
   document.getElementById('fileInput').value = '';
 }
@@ -667,6 +1240,14 @@ function showToast(msg){
   el.classList.add('show');
   setTimeout(()=>el.classList.remove('show'),3000);
 }
+
+/* ============ Initial route (deep-link / refresh support) ============ */
+(function initRoute(){
+  const hash = location.hash.replace('#','');
+  if(getToken() && hash){
+    enterApp(hash);
+  }
+})();
 </script>
 </body>
 </html>
